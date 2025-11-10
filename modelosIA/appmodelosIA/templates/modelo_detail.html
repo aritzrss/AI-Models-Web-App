@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalles de {{ modelo.nombre }}{% endblock %}
+
+{% block header %}
+  <h1>Detalles del {{ modelo.nombre }}</h1>
+{% endblock %}
+
+{% block content %}
+    <section>
+        <h2>Descripción</h2>
+        <p>{{ modelo.descripcion }}</p>
+        {% comment %} <img src="{{ modelo.imagen_detalle.url }}" alt="Detalles del {{ modelo.nombre }}" class="detalle-img"> {% endcomment %}
+    </section>
+
+    <a href="{% url 'tu_app:dashboard' %}" class="boton-volver">← Volver al dashboard</a>
+{% endblock %}
