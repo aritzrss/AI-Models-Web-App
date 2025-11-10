@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard de Modelos IA{% endblock %}
+
+{% block content %}
+<div class="model-grid">
+    {% for modelo in lista_modelos %}
+    <div class="model-card">
+
+        <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
+            <img src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}" />
+
+        <h2>{{ modelo.nombre }}</h2>
+    </a>
+    </div>
+    {% empty %}
+    <p>No hay modelos para mostrar.</p>
+    {% endfor %}
+</div>
+{% endblock %}

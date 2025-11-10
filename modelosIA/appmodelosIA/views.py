@@ -7,7 +7,7 @@ from .models import Modelo
 
 #primera vista sencilla de prueba
 def index_modelos(request):
-    return HttpResponse("Listado de modelos IA")
+    return HttpResponse("App de modelos IA")
 
 def modelos_view(request):
     "Vista para la página de detalles de modelos."
@@ -16,8 +16,12 @@ def modelos_view(request):
     return render(request, 'index.html', context)
 
 def show_modelo(request, modelo_id):
-    "Vista para la página de detalles de un modelo en concreto."
-    modelo = get_object_or_404(Modelo, pk=modelo_id)
-    parametros =  modelo.parametros.all()
-    context = { 'modelo': modelo }
-    return render(request, 'modelo.html', context)
+    """
+    Esta vista recibe un 'id' desde la URL, busca el modelo
+    correspondiente y lo pasa a la plantilla de detalle.
+    """
+    modelo_obj = get_object_or_404(Modelo, pk=modelo_id)
+    context = {
+        'modelo': modelo_obj
+    }
+    return render(request, 'modelo_detail.html', context)

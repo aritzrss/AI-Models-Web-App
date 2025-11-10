@@ -11,8 +11,8 @@
     <section>
         <h2>Descripción</h2>
         <p>{{ modelo.descripcion }}</p>
-        {% comment %} <img src="{{ modelo.imagen_detalle.url }}" alt="Detalles del {{ modelo.nombre }}" class="detalle-img"> {% endcomment %}
+        <img src="{{ modelo.imagen_dashboard.url }}" alt="Detalles del {{ modelo.nombre }}" class="detalle-img">
     </section>
 
-    <a href="{% url 'tu_app:dashboard' %}" class="boton-volver">← Volver al dashboard</a>
+    <a href="{% url 'modelo' %}" class="boton-volver">← Volver al dashboard</a>
 {% endblock %}

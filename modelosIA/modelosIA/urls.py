@@ -21,3 +21,12 @@ urlpatterns = [
     path('appmodelosIA/', include('appmodelosIA.urls')),    #nos redirige a las urls que hemos implementado en el archivo urls.py de la carpeta app
     path('admin/', admin.site.urls),
 ]
+
+
+# con esto se muestran las imagenes
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
