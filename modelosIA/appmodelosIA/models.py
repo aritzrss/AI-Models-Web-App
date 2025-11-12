@@ -16,7 +16,7 @@ class Modelo(models.Model):
 # Ahora, creamos un modelo para los parámetros
 # Cada parámetro estará relacionado con un 'Modelo'
 class Parametro(models.Model):
-    modelo = models.ForeignKey(Modelo, related_name='parametros', on_delete=models.CASCADE)
+    modelo = models.ManyToManyField(Modelo, related_name='parametros')
     nombre = models.CharField(max_length=100)
     valor = models.CharField(max_length=100)
 
