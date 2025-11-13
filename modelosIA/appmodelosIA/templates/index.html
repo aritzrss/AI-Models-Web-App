@@ -4,18 +4,112 @@
 {% block title %}Dashboard de Modelos IA{% endblock %}
 
 {% block content %}
-<div class="model-grid">
+
+<!-- ======= Filtros ======= -->
+<form method="get" style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:16px;">
+  <div>
+    <label>Tipo de tarea</label><br>
+    <select name="tipo_tarea">
+      <option value="">Todos</option>
+      {% for val,label in TipoTarea %}
+        <option value="{{ val }}" {% if f.tipo_tarea == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label>Familia</label><br>
+    <select name="familia">
+      <option value="">Todas</option>
+      {% for val,label in Familia %}
+        <option value="{{ val }}" {% if f.familia == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label>Modalidad</label><br>
+    <select name="modalidad">
+      <option value="">Todas</option>
+      {% for val,label in Modalidad %}
+        <option value="{{ val }}" {% if f.modalidad == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label>Escalado</label><br>
+    <select name="requiere_escalado">
+      <option value="">Todos</option>
+      <option value="si" {% if f.requiere_escalado == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.requiere_escalado == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Usa α</label><br>
+    <select name="usa_alpha">
+      <option value="">Todos</option>
+      <option value="si" {% if f.usa_alpha == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.usa_alpha == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Usa kernel</label><br>
+    <select name="usa_kernel">
+      <option value="">Todos</option>
+      <option value="si" {% if f.usa_kernel == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.usa_kernel == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Año desde</label><br>
+    <input type="number" name="anio_desde" value="{{ f.anio_desde }}" style="width:120px;">
+  </div>
+
+  <div>
+    <label>Año hasta</label><br>
+    <input type="number" name="anio_hasta" value="{{ f.anio_hasta }}" style="width:120px;">
+  </div>
+
+  <div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="{% url 'modelo' %}" class="btn btn-light">Limpiar</a>
+  </div>
+</form>
+
+<p class="muted" style="margin:-6px 0 12px 0;">
+  {{ lista_modelos|length }} resultados
+</p>
+
+<!-- ======= Grid de tarjetas ======= -->
+{% if lista_modelos %}
+  <div class="grid">
     {% for modelo in lista_modelos %}
-    <div class="model-card">
-
+      <div class="card">
         <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
-            <img src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}" />
-
-        <h2>{{ modelo.nombre }}</h2>
-    </a>
-    </div>
-    {% empty %}
-    <p>No hay modelos para mostrar.</p>
+          {% if modelo.imagen_dashboard %}
+            <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}">
+          {% else %}
+            <img class="img-thumb" src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+          {% endif %}
+          <h2 style="margin:10px 0 4px;">{{ modelo.nombre }}</h2>
+        </a>
+        <p class="muted">{{ modelo.descripcion|truncatechars:130 }}</p>
+        <p class="muted">
+          <strong>Tipo:</strong> {{ modelo.tipo_tarea }} ·
+          <strong>Familia:</strong> {{ modelo.familia }} ·
+          <strong>Modalidad:</strong> {{ modelo.modalidad }}
+          {% if modelo.anio_inventado %} · <strong>Año:</strong> {{ modelo.anio_inventado }}{% endif %}
+        </p>
+        <a class="btn" href="{% url 'modelo_detail' modelo_id=modelo.id %}">Ver detalles</a>
+      </div>
     {% endfor %}
-</div>
+  </div>
+{% else %}
+  <p>No hay modelos para mostrar.</p>
+{% endif %}
+
 {% endblock %}

@@ -1,18 +1,38 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Detalles de {{ modelo.nombre }}{% endblock %}
 
 {% block header %}
-  <h1>Detalles del {{ modelo.nombre }}</h1>
+  <h1>Detalles de {{ modelo.nombre }}</h1>
 {% endblock %}
 
 {% block content %}
-    <section>
-        <h2>Descripción</h2>
-        <p>{{ modelo.descripcion }}</p>
-        <img src="{{ modelo.imagen_dashboard.url }}" alt="Detalles del {{ modelo.nombre }}" class="detalle-img">
-    </section>
+  {% if modelo.imagen_dashboard %}
+    <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="Detalles de {{ modelo.nombre }}" style="height:220px;">
+  {% endif %}
 
-    <a href="{% url 'modelo' %}" class="boton-volver">← Volver al dashboard</a>
+  <section style="margin-top:12px;">
+    <h2>Descripción</h2>
+    <p>{{ modelo.descripcion }}</p>
+  </section>
+
+  <section style="margin-top:12px;">
+    <h2>Información</h2>
+    <ul>
+      <li><strong>Tipo de tarea:</strong> {{ modelo.tipo_tarea }}</li>
+      <li><strong>Familia:</strong> {{ modelo.familia }}</li>
+      <li><strong>Modalidad:</strong> {{ modelo.modalidad }}</li>
+      <li><strong>Requiere escalado:</strong> {{ modelo.requiere_escalado|yesno:"Sí,No" }}</li>
+      <li><strong>Usa α:</strong> {{ modelo.usa_alpha|yesno:"Sí,No" }}</li>
+      <li><strong>Usa kernel:</strong> {{ modelo.usa_kernel|yesno:"Sí,No" }}</li>
+      {% if modelo.anio_inventado %}
+        <li><strong>Año inventado:</strong> {{ modelo.anio_inventado }}</li>
+      {% endif %}
+    </ul>
+  </section>
+
+  <p style="margin-top:16px;">
+    <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
+  </p>
 {% endblock %}

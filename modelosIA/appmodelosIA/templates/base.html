@@ -1,27 +1,39 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dashboard IA{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    header { margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; background: #fff; }
+    .muted { color: #6b7280; font-size: 14px; margin: 6px 0; }
+    .img-thumb { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; background:#f3f4f6; }
+    .btn { display:inline-block; padding:8px 12px; background:#1f2937; color:#fff; border-radius:8px; text-decoration:none; }
+    .btn-light { background:#e5e7eb; color:#111827; }
+    footer { margin-top: 32px; color:#6b7280; font-size: 14px; }
+  </style>
+</head>
+<body>
 
-        <title>{% block title %}Dashboard IA{% endblock %}</title>
-        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    </head>
-    <body>
-        <header>
-            {% block header %}
-                <h1>Dashboard de Modelos de IA</h1>
-                <p>Selecciona un modelo para ver sus detalles y resultados.</p>
-            {% endblock %}
-        </header>
+<header>
+  {% block header %}
+    <h1>Dashboard de Modelos de IA</h1>
+    <p class="muted">Selecciona un modelo para ver sus detalles y resultados.</p>
+  {% endblock %}
+</header>
 
-        <main>
-            {% block content %}{% endblock %}
-        </main>
+<main>
+  {% block content %}{% endblock %}
+</main>
 
-        <footer>
-            <p>© 2025 Dashboard IA. Todos los derechos reservados.</p>
-        </footer>
-    </body>
+<footer>
+  <p>© 2025 Dashboard IA. Todos los derechos reservados.</p>
+</footer>
+
+</body>
 </html>
