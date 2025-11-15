@@ -1,4 +1,3 @@
-# appmodelosIA/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Modelo, TIPO_TAREA_CHOICES, FAMILIA_CHOICES, MODALIDAD_CHOICES
 import matplotlib.pyplot as plt
@@ -13,8 +12,9 @@ import base64
 from io import BytesIO
 from datetime import datetime
 
+
 def index_modelos(request):
-    return redirect('modelo')
+    return render(request, 'index.html')
 
 def modelos_view(request):
     
@@ -89,20 +89,13 @@ def modelos_view(request):
             'anio_hasta': f_anio_hasta,
         }
     }
-    return render(request, 'index.html', context)
+    return render(request, 'formulario.html', context)
 
 def show_modelo(request, modelo_id: int):
     modelo_obj = get_object_or_404(
         Modelo.objects.prefetch_related('parametros'), pk=modelo_id
     )
     return render(request, 'modelo_detail.html', {'modelo': modelo_obj})
-
-def quiz_view(request):
-    """
-    Renderiza la página del cuestionario interactivo.
-    """
-    # Suponiendo que tu archivo se llama 'quiz.html' y está en la subcarpeta
-    return render(request, 'quizz.html')
 
 # Funciones auxiliares para realizar PCA y K-Means
 def fig_to_base64(fig):
@@ -114,71 +107,83 @@ def fig_to_base64(fig):
     plt.close(fig)
     return f"data:image/png;base64,{image_base64}"
 
+
 def ejemplo_linear_regression():
-    # ... (pega aquí la función ejemplo_linear_regression COMPLETA)
-    # Cargar dataset
     diabetes = datasets.load_diabetes()
     X, y = diabetes.data, diabetes.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     modelo_lr = LinearRegression().fit(X_train, y_train)
     y_pred = modelo_lr.predict(X_test)
-    coeficientes = pd.DataFrame({'Característica': diabetes.feature_names, 'Coeficiente': modelo_lr.coef_}).sort_values('Coeficiente', key=abs, ascending=False)
+    coeficientes = pd.DataFrame({
+        'Característica': diabetes.feature_names,
+        'Coeficiente': modelo_lr.coef_
+    }).sort_values('Coeficiente', key=abs, ascending=False)
     
-    # Crear figura
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(y_test, y_pred, alpha=0.6, edgecolors='k')
-    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
-    ax.set_xlabel('Valores Reales'); ax.set_ylabel('Predicciones'); ax.set_title('Linear Regression')
+    ax.scatter(y_test, y_pred, alpha=0.6, edgecolors='k', s=80)
+    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3, label='Predicción perfecta')
+    ax.set_xlabel('Valores Reales', fontsize=13)
+    ax.set_ylabel('Predicciones', fontsize=13)
+    ax.set_title('Linear Regression: Predicciones vs Valores Reales', fontsize=15)
+    ax.legend()
+    ax.grid(True, alpha=0.3)
     
     return {
-        'n_muestras': X.shape[0], 'n_caracteristicas': X.shape[1],
-        'mse': mean_squared_error(y_test, y_pred), 'r2': r2_score(y_test, y_pred),
-        'coeficientes_df': coeficientes.to_dict('records'), # Convertimos a lista de diccionarios
+        'n_muestras': X.shape[0],
+        'n_caracteristicas': X.shape[1],
+        'mse': mean_squared_error(y_test, y_pred),
+        'r2': r2_score(y_test, y_pred),
+        'coeficientes_df': coeficientes.to_dict('records'),
         'imagen': fig_to_base64(fig)
     }
 
 def ejemplo_pca():
-    # ... (pega aquí la función ejemplo_pca COMPLETA)
     iris = datasets.load_iris()
     X, y = iris.data, iris.target
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X)
     componentes_df = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2'], index=iris.feature_names)
     
-    # Crear figura
     fig, ax = plt.subplots(figsize=(10, 6))
     for i, especie in enumerate(iris.target_names):
-        ax.scatter(X_pca[y == i, 0], X_pca[y == i, 1], label=especie, alpha=0.8)
-    ax.set_xlabel('PC1'); ax.set_ylabel('PC2'); ax.set_title('PCA del Dataset Iris')
+        ax.scatter(X_pca[y == i, 0], X_pca[y == i, 1], label=especie, alpha=0.8, s=100, edgecolors='k')
+    ax.set_xlabel(f'PC1 ({pca.explained_variance_ratio_[0]*100:.1f}% varianza)')
+    ax.set_ylabel(f'PC2 ({pca.explained_variance_ratio_[1]*100:.1f}% varianza)')
+    ax.set_title('PCA del Dataset Iris', fontsize=15)
     ax.legend()
-
+    ax.grid(True, alpha=0.3)
+    
     return {
-        'n_muestras': X.shape[0], 'n_caracteristicas_original': X.shape[1],
-        'n_componentes': 2, 'varianza_total': sum(pca.explained_variance_ratio_) * 100,
-        'componentes_df': componentes_df.reset_index().rename(columns={'index':'Característica'}).to_dict('records'),
+        'n_muestras': X.shape[0],
+        'n_caracteristicas_original': X.shape[1],
+        'n_componentes': 2,
+        'varianza_total': sum(pca.explained_variance_ratio_) * 100,
+        'componentes_df': componentes_df.reset_index().rename(columns={'index':'Característica'}).to_dict('records'), 
         'imagen': fig_to_base64(fig)
     }
 
 def ejemplo_kmeans():
-    # ... (pega aquí la función ejemplo_kmeans COMPLETA)
     iris = datasets.load_iris()
     X = iris.data
     kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
     clusters = kmeans.fit_predict(X)
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-    centroides_pca = pca.transform(kmeans.cluster_centers_)
+    pca = PCA(n_components=2).fit_transform(X)
+    centroides_pca = PCA(n_components=2).fit(X).transform(kmeans.cluster_centers_)
     
-    # Crear figura
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(X_pca[:, 0], X_pca[:, 1], c=clusters, cmap='viridis', alpha=0.6)
-    ax.scatter(centroides_pca[:, 0], centroides_pca[:, 1], c='red', marker='x', s=200, label='Centroides')
-    ax.set_xlabel('PC1'); ax.set_ylabel('PC2'); ax.set_title('K-Means Clustering del Dataset Iris')
-    ax.legend()
+    scatter = ax.scatter(pca[:, 0], pca[:, 1], c=clusters, cmap='viridis', alpha=0.7, s=100, edgecolors='k')
+    ax.scatter(centroides_pca[:, 0], centroides_pca[:, 1], c='red', marker='X', s=250, label='Centroides')
+    ax.set_xlabel('PC1')
+    ax.set_ylabel('PC2')
+    ax.set_title('K-Means Clustering del Dataset Iris', fontsize=15)
+    ax.legend(*scatter.legend_elements(), title='Clusters')
+    ax.grid(True, alpha=0.3)
     
     return {
-        'n_muestras': X.shape[0], 'n_clusters': 3,
-        'silhouette': silhouette_score(X, clusters), 'inercia': kmeans.inertia_,
+        'n_muestras': X.shape[0],
+        'n_clusters': 3,
+        'silhouette': silhouette_score(X, clusters),
+        'inercia': kmeans.inertia_,
         'imagen_clusters': fig_to_base64(fig)
     }
 

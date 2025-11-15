@@ -26,7 +26,7 @@ MODALIDAD_CHOICES = [
 ]
 
 
-# --- Modelo principal: info + filtros ---
+# Modelo principal: info + filtros
 class Modelo(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.TextField()
@@ -62,7 +62,7 @@ class Modelo(models.Model):
         return self.nombre
 
 
-# --- Parámetros informativos (pares clave-valor) por modelo ---
+# Parámetros informativos por modelo 
 # Relación 1─N: un Modelo tiene muchos parámetros.
 class Parametro(models.Model):
     modelo = models.ForeignKey(

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard de Modelos IA{% endblock %}
+
+{% block content %}
+
+<!-- Formulario -->
+<form method="get" class="form-filters">
+  <div>
+    <label>Tipo de tarea</label>
+    <select name="tipo_tarea">
+      <option value="">Todos</option>
+      {% for val,label in TipoTarea %}
+        <option value="{{ val }}" {% if f.tipo_tarea == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Familia</label>
+    <select name="familia">
+      <option value="">Todas</option>
+      {% for val,label in Familia %}
+        <option value="{{ val }}" {% if f.familia == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Modalidad</label>
+    <select name="modalidad">
+      <option value="">Todas</option>
+      {% for val,label in Modalidad %}
+        <option value="{{ val }}" {% if f.modalidad == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Escalado</label>
+    <select name="requiere_escalado">
+      <option value="">Todos</option>
+      <option value="si" {% if f.requiere_escalado == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.requiere_escalado == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div>
+    <label>Usa α</label>
+    <select name="usa_alpha">
+      <option value="">Todos</option>
+      <option value="si" {% if f.usa_alpha == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.usa_alpha == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div>
+    <label>Usa kernel</label>
+    <select name="usa_kernel">
+      <option value="">Todos</option>
+      <option value="si" {% if f.usa_kernel == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if f.usa_kernel == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div>
+    <label>Año desde</label>
+    <input type="number" name="anio_desde" value="{{ f.anio_desde }}">
+  </div>
+  <div>
+    <label>Año hasta</label>
+    <input type="number" name="anio_hasta" value="{{ f.anio_hasta }}">
+  </div>
+  <div>
+    <button type="submit" class="btn">Filtrar</button>
+    <a href="{% url 'modelo' %}" class="btn btn-light">Limpiar</a>
+  </div>
+</form>
+
+<p class="muted">{{ lista_modelos|length }} resultados</p>
+
+<!-- Grid de tarjetas -->
+{% if lista_modelos %}
+  <div class="grid">
+    {% for modelo in lista_modelos %}
+      <div class="card">
+        <!-- Contenido principal de cada modelo -->
+        <div class="card-content">
+          <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
+            <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}">
+            <h2>{{ modelo.nombre }}</h2>
+          </a>
+          <p>{{ modelo.descripcion|truncatechars:120 }}</p>
+          <p class="tags">
+            <strong>Tipo:</strong> {{ modelo.get_tipo_tarea_display }} ·
+            <strong>Familia:</strong> {{ modelo.get_familia_display }}
+            {% if modelo.anio_inventado %} · <strong>Año:</strong> {{ modelo.anio_inventado }}{% endif %}
+          </p>
+        </div>
+        <!-- Botón para abrir cada modelo -->
+        <a class="btn" href="{% url 'modelo_detail' modelo_id=modelo.id %}">Ver detalles</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No hay modelos para mostrar.</p>
+{% endif %}
+
+{% endblock %}

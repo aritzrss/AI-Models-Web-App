@@ -39,5 +39,4 @@ class ModeloIAAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Modelo, ModeloIAAdmin)
-# (Opcional) si quieres ver Parametro como lista independiente:
-# admin.site.register(Parametro)
+

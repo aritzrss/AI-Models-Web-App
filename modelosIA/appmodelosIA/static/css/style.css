@@ -40,7 +40,7 @@ header h1 { margin: 0; }
     margin: 0 auto;
     display: flex;
     justify-content: space-between; /* Empuja el logo a la izq y los links a la der */
-    align-items: center; /* Centra verticalmente los elementos */
+    align-items: center; 
 }
 
 .navbar-brand {
@@ -155,7 +155,6 @@ header h1 { margin: 0; }
     font-size: 1em;
 }
 
-/* Estilo por defecto (oscuro) */
 .btn {
     background-color: #333;
     color: #ffffff;
@@ -236,71 +235,3 @@ footer {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ======================================================= */
-/* === ESTILOS PARA LA PÁGINA DEL QUIZ (quiz.html) === */
-/* ======================================================= */
-
-.quiz-container { max-width: 800px; margin: 0 auto; }
-.quiz-box { background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.12); margin-bottom: 2rem; }
-.pregunta { display: none; }
-.pregunta.activa { display: block; }
-.pregunta h2 { color: #1e3a8a; margin-bottom: 1.5rem; font-size: 1.5rem; }
-.progreso-bar { height: 8px; background: #e2e8f0; border-radius: 10px; margin-bottom: 2rem; overflow: hidden; }
-.progreso-fill { height: 100%; background: #1e3a8a; width: 0; }
-.progreso-texto { text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 1rem; }
-.opciones { display: grid; gap: 1rem; }
-.opcion { background: #f8fafc; border: 3px solid #e2e8f0; border-radius: 12px; padding: 1.2rem; cursor: pointer; position: relative; }
-.opcion:hover { border-color: #3b82f6; background: #eff6ff; }
-.opcion.seleccionada { border-color: #1e3a8a; background: #dbeafe; }
-.opcion-texto { margin-left: 2rem; font-size: 1.05rem; color: #334155; }
-.botones { display: flex; gap: 1rem; margin-top: 2rem; justify-content: space-between; }
-.btn-siguiente { background: #1e3a8a; color: white; flex: 1; }
-.btn-siguiente:disabled { background: #cbd5e1; cursor: not-allowed; }
-.btn-anterior { background: #e2e8f0; color: #475569; }
-.resultado { display: none; text-align: center; }
-.resultado.activo { display: block; }
-.resultado-icono { font-size: 5rem; margin-bottom: 1rem; }
-.resultado h2 { color: #1e3a8a; font-size: 2rem; margin-bottom: 1rem; }
-.resultado-descripcion { background: #f0f9ff; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; text-align: left; border-left: 4px solid #1e3a8a; }
-.resultado-lista { list-style: none; padding: 0; }
-.resultado-lista li { padding: 0.5rem 0; }
-.ejemplos { background: #fef3c7; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
-.btn-reiniciar { background: #1e3a8a; color: white; margin-top: 1.5rem; }
-
-
-/* Responsive para la timeline */
-@media (max-width: 768px) {
-    .timeline::before { left: 30px; }
-    .timeline-event { flex-direction: row !important; }
-    .timeline-content { width: calc(100% - 80px); margin-left: 60px; }
-    .timeline-content::before { left: -20px !important; right: auto !important; border-right-color: white !important; border-left-color: transparent !important; }
-    .timeline-dot { left: 30px; }
-}
