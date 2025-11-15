@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reporte de Modelos de Machine Learning{% endblock %}
+
+{% block header %}
+  <h1>Reporte de Machine Learning</h1>
+  <p class="muted">Análisis de Modelos: Linear Regression, PCA y K-Means</p>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos específicos para esta página */
+    .seccion {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 5px solid #007bff;
+    }
+    .seccion h2 {
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #eee;
+    }
+    .seccion h3 {
+        color: #555;
+        font-size: 1.3rem;
+        margin: 1.5rem 0 1rem 0;
+    }
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .metric-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+    .metric-card .label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .metric-card .value {
+        color: #007bff;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+    .imagen-container {
+        text-align: center;
+        margin: 2rem 0;
+    }
+    .imagen-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    th {
+        background-color: #f8f9fa;
+    }
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<div class="report-content">
+
+    <!-- SECCIÓN LINEAR REGRESSION -->
+    <div class="seccion">
+        <h2>📈 1. Linear Regression</h2>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="label">Muestras</div>
+                    <div class="value">{{ resultados_lr.n_muestras }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">R² Score</div>
+                    <div class="value">{{ resultados_lr.r2|floatformat:3 }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">MSE</div>
+                    <div class="value">{{ resultados_lr.mse|floatformat:2 }}</div>
+            </div>
+        </div>
+        <h3>Importancia de Características</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Característica</th>
+                    <th>Coeficiente</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for row in resultados_lr.coeficientes_df %}
+                <tr><td><strong>{{ row.Característica }}</strong></td><td>{{ row.Coeficiente|floatformat:2 }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Visualización</h3>
+        <div class="imagen-container">
+            <img src="{{ resultados_lr.imagen }}" alt="Linear Regression Results">
+        </div>
+    </div>
+
+    <!-- SECCIÓN PCA -->
+    <div class="seccion">
+        <h2>🔍 2. PCA</h2>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="label">Dimensión Original</div>
+                <div class="value">{{ resultados_pca.n_caracteristicas_original }}D</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Dimensión Reducida</div>
+                <div class="value">{{ resultados_pca.n_componentes }}D</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Varianza Explicada</div>
+                <div class="value">{{ resultados_pca.varianza_total|floatformat:2 }}%</div>
+            </div>
+        </div>
+        <h3>Cargas de Componentes</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Característica</th>
+                    <th>PC1</th>
+                    <th>PC2</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in resultados_pca.componentes_df %}
+                <tr>
+                    <td><strong>{{ row.Característica }}</strong></td>
+                    <td>{{ row.PC1|floatformat:4 }}</td>
+                    <td>{{ row.PC2|floatformat:4 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Visualización</h3>
+        <div class="imagen-container">
+            <img src="{{ resultados_pca.imagen }}" alt="PCA Results">
+        </div>
+    </div>
+
+    <!-- SECCIÓN K-MEANS -->
+    <div class="seccion">
+        <h2>🎯 3. K-Means Clustering</h2>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="label">Clusters</div>
+                <div class="value">{{ resultados_kmeans.n_clusters }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Silhouette Score</div>
+                <div class="value">{{ resultados_kmeans.silhouette|floatformat:3 }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="label">Inercia</div>
+                <div class="value">{{ resultados_kmeans.inercia|floatformat:2 }}</div>
+            </div>
+        </div>
+        <h3>Visualización</h3>
+        <div class="imagen-container">
+            <img src="{{ resultados_kmeans.imagen_clusters }}" alt="K-Means Clusters">
+        </div>
+    </div>
+</div>
+{% endblock %}

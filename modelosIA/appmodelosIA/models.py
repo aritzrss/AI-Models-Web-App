@@ -1,27 +1,29 @@
 from django.db import models
 
-# --- Opciones para los filtros ---
-class TipoTarea(models.TextChoices):
-    CLASIFICACION = "clasificacion", "Clasificación"
-    REGRESION     = "regresion", "Regresión"
-    AGRUPAMIENTO  = "clustering", "Agrupamiento (Clustering)"
-    REDUCCION     = "reduccion_dimensional", "Reducción dimensional"
-    GENERATIVO    = "generativo", "Generativo"
+TIPO_TAREA_CHOICES = [
+    ("clasificacion", "Clasificación"),
+    ("regresion", "Regresión"),
+    ("clustering", "Agrupamiento (Clustering)"),
+    ("reduccion_dimensional", "Reducción dimensional"),
+    ("generativo", "Generativo"),
+]
 
-class Familia(models.TextChoices):
-    LINEAL       = "lineal", "Lineal"
-    DISTANCIA    = "distancia", "Basado en distancia"
-    KERNEL       = "kernel", "Kernel"
-    ARBOL        = "arbol", "Árbol"
-    CONJUNTO     = "ensemble", "Conjunto (Ensemble)"
-    RED_NEURONAL = "red_neuronal", "Red neuronal"
-    TRANSFORMER  = "transformer", "Transformer"
-    PROYECCION   = "proyeccion", "Proyección (PCA)"
+FAMILIA_CHOICES = [
+    ("lineal", "Lineal"),
+    ("distancia", "Basado en distancia"),
+    ("kernel", "Kernel"),
+    ("arbol", "Árbol"),
+    ("ensemble", "Conjunto (Ensemble)"),
+    ("red_neuronal", "Red neuronal"),
+    ("transformer", "Transformer"),
+    ("proyeccion", "Proyección (PCA)"),
+]
 
-class Modalidad(models.TextChoices):
-    TABULAR = "tabular", "Tabular"
-    TEXTO   = "texto", "Texto"
-    VISION  = "vision", "Visión"
+MODALIDAD_CHOICES = [
+    ("tabular", "Tabular"),
+    ("texto", "Texto"),
+    ("vision", "Visión"),
+]
 
 
 # --- Modelo principal: info + filtros ---
@@ -33,13 +35,13 @@ class Modelo(models.Model):
 
     # Filtros principales
     tipo_tarea = models.CharField(
-        max_length=25, choices=TipoTarea.choices, help_text="Tipo de tarea principal"
+        max_length=25, choices=TIPO_TAREA_CHOICES, help_text="Tipo de tarea principal"
     )
     familia = models.CharField(
-        max_length=20, choices=Familia.choices, help_text="Familia/algoritmo"
+        max_length=20, choices=FAMILIA_CHOICES, help_text="Familia/algoritmo"
     )
     modalidad = models.CharField(
-        max_length=15, choices=Modalidad.choices, default=Modalidad.TABULAR,
+        max_length=15, choices=MODALIDAD_CHOICES, default="tabular",
         help_text="Modalidad de datos típica"
     )
     requiere_escalado = models.BooleanField(

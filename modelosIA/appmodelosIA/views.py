@@ -1,24 +1,44 @@
 # appmodelosIA/views.py
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Modelo
+from .models import Modelo, TIPO_TAREA_CHOICES, FAMILIA_CHOICES, MODALIDAD_CHOICES
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from sklearn.metrics import mean_squared_error, r2_score, silhouette_score
+import pandas as pd
+import base64
+from io import BytesIO
+from datetime import datetime
 
 def index_modelos(request):
     return redirect('modelo')
 
 def modelos_view(request):
+    
+    """
+        El usuario realizará distintos filtrados para ver unos modelos u otros.
+        Esta función explica paso a paso como se gestionan los filtrados.
+        Para ello hemos realizado un formulario básico donde recogíamos las características y las cogíamos de la BD.
+    """
+    # 1. Empezamos con todos los modelos, ordenados por nombre
     qs = Modelo.objects.all().order_by('nombre')
 
-    # --- Lee filtros del querystring ---
-    f_tipo = request.GET.get('tipo_tarea') or ""
-    f_familia = request.GET.get('familia') or ""
-    f_modalidad = request.GET.get('modalidad') or ""
-    f_escalado = request.GET.get('requiere_escalado') or ""  # "si" / "no" / ""
-    f_alpha = request.GET.get('usa_alpha') or ""             # "si" / "no" / ""
-    f_kernel = request.GET.get('usa_kernel') or ""           # "si" / "no" / ""
-    f_anio_desde = request.GET.get('anio_desde') or ""
-    f_anio_hasta = request.GET.get('anio_hasta') or ""
+    # 2. Leemos todos los posibles filtros que vienen en la URL (?param=valor&...)
+    f_tipo = request.GET.get('tipo_tarea', '')
+    f_familia = request.GET.get('familia', '')
+    f_modalidad = request.GET.get('modalidad', '')
+    f_escalado = request.GET.get('requiere_escalado', '')  # "si", "no", o ""
+    f_alpha = request.GET.get('usa_alpha', '')             # "si", "no", o ""
+    f_kernel = request.GET.get('usa_kernel', '')           # "si", "no", o ""
+    f_anio_desde = request.GET.get('anio_desde', '')
+    f_anio_hasta = request.GET.get('anio_hasta', '')
 
-    # --- Aplica filtros si vienen ---
+    # 3. Aplicamos los filtros uno por uno si el usuario los ha rellenado
+
+    # Filtros de texto (selects)
     if f_tipo:
         qs = qs.filter(tipo_tarea=f_tipo)
     if f_familia:
@@ -26,50 +46,38 @@ def modelos_view(request):
     if f_modalidad:
         qs = qs.filter(modalidad=f_modalidad)
 
-    def _bool_filter(val, field):
-        if val == "si":
-            return {field: True}
-        if val == "no":
-            return {field: False}
-        return {}
+    match f_escalado:
+        case "si":
+            qs = qs.filter(requiere_escalado=True)
+        case "no":
+            qs = qs.filter(requiere_escalado=False)
+    
+    match f_alpha:
+        case "si":
+            qs = qs.filter(usa_alpha=True)
+        case "no":
+            qs = qs.filter(usa_alpha=False)
 
-    qs = qs.filter(**_bool_filter(f_escalado, "requiere_escalado"))
-    qs = qs.filter(**_bool_filter(f_alpha, "usa_alpha"))
-    qs = qs.filter(**_bool_filter(f_kernel, "usa_kernel"))
+    match f_kernel:
+        case "si":
+            qs = qs.filter(usa_kernel=True)
+        case "no":
+            qs = qs.filter(usa_kernel=False)
 
-    try:
-        if f_anio_desde:
-            qs = qs.filter(anio_inventado__gte=int(f_anio_desde))
-    except ValueError:
-        pass
-    try:
-        if f_anio_hasta:
-            qs = qs.filter(anio_inventado__lte=int(f_anio_hasta))
-    except ValueError:
-        pass
+    # Filtros de año, asegurándonos de que son números antes de filtrar
+    if f_anio_desde and f_anio_desde.isdigit():
+        qs = qs.filter(anio_inventado__gte=int(f_anio_desde))
+    
+    if f_anio_hasta and f_anio_hasta.isdigit():
+        qs = qs.filter(anio_inventado__lte=int(f_anio_hasta))
 
-    # ===== Choices seguros =====
-    # Si el campo tiene choices definidos en models.py se usan;
-    # si no, se generan a partir de los valores distintos en BD.
-    def safe_choices(field_name):
-        field = Modelo._meta.get_field(field_name)
-        if field.choices:
-            return field.choices
-        vals = (Modelo.objects
-                .values_list(field_name, flat=True)
-                .distinct()
-                .order_by(field_name))
-        return [(v, v) for v in vals if v not in (None, "")]
-
-    tipo_choices = safe_choices("tipo_tarea")
-    familia_choices = safe_choices("familia")
-    modalidad_choices = safe_choices("modalidad")
-
+    # Tras todos los filtros, los añadimos al contexto que volcamos en el HTML
     context = {
         'lista_modelos': qs,
-        'TipoTarea': tipo_choices,
-        'Familia': familia_choices,
-        'Modalidad': modalidad_choices,
+        'TipoTarea': TIPO_TAREA_CHOICES,
+        'Familia': FAMILIA_CHOICES,
+        'Modalidad': MODALIDAD_CHOICES,
+        # Valores de los filtros
         'f': {
             'tipo_tarea': f_tipo,
             'familia': f_familia,
@@ -88,3 +96,112 @@ def show_modelo(request, modelo_id: int):
         Modelo.objects.prefetch_related('parametros'), pk=modelo_id
     )
     return render(request, 'modelo_detail.html', {'modelo': modelo_obj})
+
+def quiz_view(request):
+    """
+    Renderiza la página del cuestionario interactivo.
+    """
+    # Suponiendo que tu archivo se llama 'quiz.html' y está en la subcarpeta
+    return render(request, 'quizz.html')
+
+# Funciones auxiliares para realizar PCA y K-Means
+def fig_to_base64(fig):
+    """Convierte una figura de matplotlib a base64 para incrustar en HTML"""
+    buffer = BytesIO()
+    fig.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.read()).decode()
+    plt.close(fig)
+    return f"data:image/png;base64,{image_base64}"
+
+def ejemplo_linear_regression():
+    # ... (pega aquí la función ejemplo_linear_regression COMPLETA)
+    # Cargar dataset
+    diabetes = datasets.load_diabetes()
+    X, y = diabetes.data, diabetes.target
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    modelo_lr = LinearRegression().fit(X_train, y_train)
+    y_pred = modelo_lr.predict(X_test)
+    coeficientes = pd.DataFrame({'Característica': diabetes.feature_names, 'Coeficiente': modelo_lr.coef_}).sort_values('Coeficiente', key=abs, ascending=False)
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(y_test, y_pred, alpha=0.6, edgecolors='k')
+    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+    ax.set_xlabel('Valores Reales'); ax.set_ylabel('Predicciones'); ax.set_title('Linear Regression')
+    
+    return {
+        'n_muestras': X.shape[0], 'n_caracteristicas': X.shape[1],
+        'mse': mean_squared_error(y_test, y_pred), 'r2': r2_score(y_test, y_pred),
+        'coeficientes_df': coeficientes.to_dict('records'), # Convertimos a lista de diccionarios
+        'imagen': fig_to_base64(fig)
+    }
+
+def ejemplo_pca():
+    # ... (pega aquí la función ejemplo_pca COMPLETA)
+    iris = datasets.load_iris()
+    X, y = iris.data, iris.target
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+    componentes_df = pd.DataFrame(pca.components_.T, columns=['PC1', 'PC2'], index=iris.feature_names)
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for i, especie in enumerate(iris.target_names):
+        ax.scatter(X_pca[y == i, 0], X_pca[y == i, 1], label=especie, alpha=0.8)
+    ax.set_xlabel('PC1'); ax.set_ylabel('PC2'); ax.set_title('PCA del Dataset Iris')
+    ax.legend()
+
+    return {
+        'n_muestras': X.shape[0], 'n_caracteristicas_original': X.shape[1],
+        'n_componentes': 2, 'varianza_total': sum(pca.explained_variance_ratio_) * 100,
+        'componentes_df': componentes_df.reset_index().rename(columns={'index':'Característica'}).to_dict('records'),
+        'imagen': fig_to_base64(fig)
+    }
+
+def ejemplo_kmeans():
+    # ... (pega aquí la función ejemplo_kmeans COMPLETA)
+    iris = datasets.load_iris()
+    X = iris.data
+    kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+    clusters = kmeans.fit_predict(X)
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+    centroides_pca = pca.transform(kmeans.cluster_centers_)
+    
+    # Crear figura
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(X_pca[:, 0], X_pca[:, 1], c=clusters, cmap='viridis', alpha=0.6)
+    ax.scatter(centroides_pca[:, 0], centroides_pca[:, 1], c='red', marker='x', s=200, label='Centroides')
+    ax.set_xlabel('PC1'); ax.set_ylabel('PC2'); ax.set_title('K-Means Clustering del Dataset Iris')
+    ax.legend()
+    
+    return {
+        'n_muestras': X.shape[0], 'n_clusters': 3,
+        'silhouette': silhouette_score(X, clusters), 'inercia': kmeans.inertia_,
+        'imagen_clusters': fig_to_base64(fig)
+    }
+
+# Vista de los modelos implementados
+
+def reporte_view(request):
+    """
+    Ejecuta los modelos de ML y muestra los resultados en una plantilla.
+    """
+    # 1. Ejecutar cada modelo para obtener los resultados
+    resultados_lr = ejemplo_linear_regression()
+    resultados_pca = ejemplo_pca()
+    resultados_kmeans = ejemplo_kmeans()
+
+    # 2. Crear el contexto para pasarlo a la plantilla
+    context = {
+        'fecha_actual': datetime.now(),
+        'resultados_lr': resultados_lr,
+        'resultados_pca': resultados_pca,
+        'resultados_kmeans': resultados_kmeans,
+    }
+
+    # 3. Renderizar la plantilla con el contexto
+    return render(request, 'reporte.html', context)
+    
+    

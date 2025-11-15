@@ -4,25 +4,29 @@
 {% block title %}Detalles de {{ modelo.nombre }}{% endblock %}
 
 {% block header %}
-  <h1>Detalles de {{ modelo.nombre }}</h1>
+  <h1>{{ modelo.nombre }}</h1>
+  <p class="muted">Información detallada y parámetros del modelo.</p>
 {% endblock %}
 
 {% block content %}
-  {% if modelo.imagen_dashboard %}
-    <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="Detalles de {{ modelo.nombre }}" style="height:220px;">
-  {% endif %}
 
-  <section style="margin-top:12px;">
-    <h2>Descripción</h2>
-    <p>{{ modelo.descripcion }}</p>
-  </section>
+<div class="detail-layout">
 
-  <section style="margin-top:12px;">
-    <h2>Información</h2>
-    <ul>
-      <li><strong>Tipo de tarea:</strong> {{ modelo.tipo_tarea }}</li>
-      <li><strong>Familia:</strong> {{ modelo.familia }}</li>
-      <li><strong>Modalidad:</strong> {{ modelo.modalidad }}</li>
+  <!-- Columna izquierda: Imagen y descripción -->
+  <div class="detail-main">
+    {% if modelo.imagen_dashboard %}
+      <img class="detail-image" src="{{ modelo.imagen_dashboard.url }}" alt="Ilustración de {{ modelo.nombre }}">
+    {% endif %}
+    <h2 style="margin-top: 24px;">Descripción</h2>
+    <p>{{ modelo.descripcion|linebreaks }}</p>
+  </div>
+
+  <!-- Columna derecha: Información clave y parámetros -->
+  <div class="detail-sidebar">
+    <ul class="info-list">
+      <li><strong>Tipo de tarea:</strong> {{ modelo.get_tipo_tarea_display }}</li>
+      <li><strong>Familia:</strong> {{ modelo.get_familia_display }}</li>
+      <li><strong>Modalidad:</strong> {{ modelo.get_modalidad_display }}</li>
       <li><strong>Requiere escalado:</strong> {{ modelo.requiere_escalado|yesno:"Sí,No" }}</li>
       <li><strong>Usa α:</strong> {{ modelo.usa_alpha|yesno:"Sí,No" }}</li>
       <li><strong>Usa kernel:</strong> {{ modelo.usa_kernel|yesno:"Sí,No" }}</li>
@@ -30,9 +34,12 @@
         <li><strong>Año inventado:</strong> {{ modelo.anio_inventado }}</li>
       {% endif %}
     </ul>
-  </section>
+  </div>
 
-  <p style="margin-top:16px;">
-    <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
-  </p>
+</div>
+
+<p style="margin-top: 32px;">
+  <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
+</p>
+
 {% endblock %}
