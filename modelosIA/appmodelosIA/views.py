@@ -14,7 +14,13 @@ from datetime import datetime
 
 
 def index_modelos(request):
-    return render(request, 'index.html')
+    ultimos_modelos = Modelo.objects.all().exclude(anio_inventado__isnull=True).order_by('-anio_inventado')[:3]
+    
+    context = {
+        'ultimos_modelos': ultimos_modelos
+    }
+    
+    return render(request, 'index.html', context)
 
 def modelos_view(request):
     

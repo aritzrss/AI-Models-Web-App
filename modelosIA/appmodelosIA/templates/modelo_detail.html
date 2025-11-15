@@ -5,14 +5,14 @@
 
 {% block header %}
   <h1>{{ modelo.nombre }}</h1>
-  <p class="muted">Información detallada y parámetros del modelo.</p>
+  <p class="default">Información detallada y parámetros del modelo.</p>
 {% endblock %}
 
 {% block content %}
 
 <div class="detail-layout">
 
-  <!-- Columna izquierda: Imagen y descripción -->
+  {% comment %} Columna izquierda: Imagen y descripción {% endcomment %}
   <div class="detail-main">
     {% if modelo.imagen_dashboard %}
       <img class="detail-image" src="{{ modelo.imagen_dashboard.url }}" alt="Ilustración de {{ modelo.nombre }}">
@@ -21,7 +21,7 @@
     <p>{{ modelo.descripcion|linebreaks }}</p>
   </div>
 
-  <!-- Columna derecha: Información clave y parámetros -->
+  {% comment %} Columna derecha: Información clave y parámetros {% endcomment %}
   <div class="detail-sidebar">
     <ul class="info-list">
       <li><strong>Tipo de tarea:</strong> {{ modelo.get_tipo_tarea_display }}</li>

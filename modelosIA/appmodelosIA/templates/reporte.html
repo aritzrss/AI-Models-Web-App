@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Reporte de Modelos de Machine Learning{% endblock %}
+{% block title %}Reporte de Modelos{% endblock %}
 
 {% block header %}
   <h1>Reporte de Machine Learning</h1>
-  <p class="muted">Análisis de Modelos: Linear Regression, PCA y K-Means</p>
+  <p class="default">Análisis de Modelos: Linear Regression, PCA y K-Means</p>
 {% endblock %}
 
 {% block content %}
@@ -84,7 +84,7 @@
 
 <div class="report-content">
 
-    <!-- SECCIÓN LINEAR REGRESSION -->
+    {% comment %} SECCIÓN LINEAR REGRESSION {% endcomment %}
     <div class="seccion">
         <h2>📈 1. Linear Regression</h2>
         <div class="metric-grid">
@@ -122,7 +122,7 @@
         </div>
     </div>
 
-    <!-- SECCIÓN PCA -->
+    {% comment %} SECCIÓN PCA {% endcomment %}
     <div class="seccion">
         <h2>🔍 2. PCA</h2>
         <div class="metric-grid">
@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <!-- SECCIÓN K-MEANS -->
+    {% comment %} SECCIÓN K-MEANS {% endcomment %}
     <div class="seccion">
         <h2>🎯 3. K-Means Clustering</h2>
         <div class="metric-grid">

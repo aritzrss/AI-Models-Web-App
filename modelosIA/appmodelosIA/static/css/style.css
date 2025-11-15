@@ -20,8 +20,14 @@ header {
     border-bottom: 1px solid #eee;
     margin-bottom: 24px;
 }
-header h1 { margin: 0; }
-.muted { color: #777; font-size: 1rem; }
+header h1 { 
+    margin: 0; 
+}
+
+.muted {
+    color: #777;
+    font-size: 1rem;
+}
 
 /* Navigation bar */
 

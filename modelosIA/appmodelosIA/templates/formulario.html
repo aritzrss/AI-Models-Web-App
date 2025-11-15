@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Dashboard de Modelos IA{% endblock %}
+{% block title %}Modelos IA{% endblock %}
 
 {% block content %}
 
-<!-- Formulario -->
+{% comment %} Formulario {% endcomment %}
 <form method="get" class="form-filters">
   <div>
     <label>Tipo de tarea</label>
@@ -72,14 +72,14 @@
   </div>
 </form>
 
-<p class="muted">{{ lista_modelos|length }} resultados</p>
+<p class="default">{{ lista_modelos|length }} resultados</p>
 
-<!-- Grid de tarjetas -->
+{% comment %} Grid de tarjetas {% endcomment %}
 {% if lista_modelos %}
   <div class="grid">
     {% for modelo in lista_modelos %}
       <div class="card">
-        <!-- Contenido principal de cada modelo -->
+        {% comment %} Contenido principal de cada modelo {% endcomment %}
         <div class="card-content">
           <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
             <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}">
@@ -92,7 +92,7 @@
             {% if modelo.anio_inventado %} · <strong>Año:</strong> {{ modelo.anio_inventado }}{% endif %}
           </p>
         </div>
-        <!-- Botón para abrir cada modelo -->
+        {% comment %} Botón para abrir cada modelo {% endcomment %}
         <a class="btn" href="{% url 'modelo_detail' modelo_id=modelo.id %}">Ver detalles</a>
       </div>
     {% endfor %}

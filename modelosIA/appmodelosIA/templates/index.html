@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard de IA{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<style>
+    .index-section {
+        text-align: center;
+        padding: 60px 20px;
+        background-color: #fff;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        border: 1px solid #eee;
+    }
+    .index-section h1 {
+        font-size: 3rem;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    .index-section .intro {
+        font-size: 1.3rem;
+        color: #555;
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+    }
+    .section-title {
+        text-align: center;
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .descripcion{
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto 40px auto;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="index-section">
+    <h1>Bienvenido al Mundo de la IA</h1>
+    <p class="intro">
+        Un espacio interactivo para explorar, entender y comparar los modelos de Machine Learning
+        que están transformando nuestro mundo.
+    </p>
+    <a href="{% url 'modelo' %}" class="btn">Explorar todos los modelos</a>
+</div>
+
+<div>
+    <h2 class="section-title">¿Qué son los Modelos de IA?</h2>
+    <p class="descripcion">
+    Los modelos de Inteligencia Artificial son como "cerebros" entrenados por ordenador para realizar tareas específicas. 
+    Aprenden de datos para reconocer patrones, hacer predicciones o generar contenido nuevo. Desde clasificar un correo como spam hasta conducir un coche, los modelos de IA son la fuerza motriz de la tecnología moderna.
+    </p>
+</div>
+
+{% comment %} Sección con los 3 últimos modelos {% endcomment %}
+<div>
+    <h2 class="section-title">Últimos Modelos Añadidos</h2>
+
+    {% if ultimos_modelos %}
+    <div class="grid">
+        {% for modelo in ultimos_modelos %}
+        <div class="card">
+            <div class="card-content">
+            <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
+                <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}">
+                <h2>{{ modelo.nombre }}</h2>
+            </a>
+            <p>{{ modelo.descripcion|truncatechars:100 }}</p>
+            <p class="tags">
+                <strong>Añadido:</strong> {{ modelo.fecha_creacion|date:"d M Y" }}
+            </p>
+            </div>
+            <a class="btn" href="{% url 'modelo_detail' modelo_id=modelo.id %}">Aprender más</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Aún no se han añadido modelos.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
