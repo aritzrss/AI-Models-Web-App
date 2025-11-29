@@ -10,19 +10,77 @@
 
 {% block content %}
 
+{# Estilos específicos para esta página #}
+<style>
+    /* Clases auxiliares para no ensuciar el HTML con style="" */
+    .sidebar-section {
+        background: #f8f9fa; 
+        padding: 20px; 
+        border-radius: 8px; 
+        border: 1px solid #ddd;
+        margin-top: 20px;
+    }
+    
+    .rating-header {
+        margin-bottom: 15px;
+    }
+    
+    .rating-score {
+        font-size: 2em; 
+        color: #ffc107;
+        margin-right: 5px;
+    }
+    
+    .rating-value {
+        font-size: 1.5em; 
+        font-weight: bold;
+    }
+    
+    .rating-subtext {
+        margin: 0; 
+        color: #888; 
+        font-size: 0.9em;
+    }
+
+    .param-list {
+        list-style-type: none; 
+        padding: 0;
+    }
+
+    .param-item {
+        background: #fff; /* Blanco para contrastar con el fondo gris de la sidebar */
+        border: 1px solid #eee;
+        margin-bottom: 5px; 
+        padding: 10px; 
+        border-radius: 4px; 
+        display: flex; 
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .vote-controls {
+        display: flex; 
+        gap: 10px; 
+        width: 100%;
+    }
+</style>
+
 <div class="detail-layout">
 
-  {% comment %} Columna izquierda: Imagen y descripción {% endcomment %}
+  {% comment %} --- COLUMNA IZQUIERDA: VISUAL Y DESCRIPTIVA --- {% endcomment %}
   <div class="detail-main">
     {% if modelo.imagen_dashboard %}
       <img class="detail-image" src="{{ modelo.imagen_dashboard.url }}" alt="Ilustración de {{ modelo.nombre }}">
     {% endif %}
+    
     <h2 style="margin-top: 24px;">Descripción</h2>
     <p>{{ modelo.descripcion|linebreaks }}</p>
   </div>
 
-  {% comment %} Columna derecha: Información clave y parámetros {% endcomment %}
+  {% comment %} --- COLUMNA DERECHA: DATOS TÉCNICOS E INTERACCIÓN --- {% endcomment %}
   <div class="detail-sidebar">
+    
+    <!-- 1. Ficha Técnica Básica -->
     <ul class="info-list">
       <li><strong>Tipo de tarea:</strong> {{ modelo.get_tipo_tarea_display }}</li>
       <li><strong>Familia:</strong> {{ modelo.get_familia_display }}</li>
@@ -34,12 +92,69 @@
         <li><strong>Año inventado:</strong> {{ modelo.anio_inventado }}</li>
       {% endif %}
     </ul>
+
+    <!-- 2. Parámetros Técnicos -->
+    <div class="sidebar-section">
+        <h3 style="margin-top:0;">Parámetros Técnicos</h3>
+        
+        {% if modelo.parametros.all %}
+            <ul class="param-list">
+                {% for param in modelo.parametros.all %}
+                    <li class="param-item">
+                        <strong>{{ param.nombre }}</strong> 
+                        <span style="font-family: monospace; color: #d63384;">{{ param.valor }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p style="color: #666; font-style: italic;">No hay parámetros definidos.</p>
+        {% endif %}
+    </div>
+
+    <!-- 3. Caja de Valoración -->
+    <div class="sidebar-section">
+        <h3 style="margin-top:0;">Valoración</h3>
+        
+        <!-- Info actual -->
+        <div class="rating-header">
+            <span class="rating-score">★</span>
+            <span class="rating-value">{{ modelo.rating_promedio|floatformat:1 }}</span>
+            <span style="color: #666;">/ 5</span>
+            <p class="rating-subtext">Basado en {{ modelo.cantidad_votos }} votos</p>
+        </div>
+
+        <!-- Formulario Votar -->
+        <form action="{% url 'votar_modelo' modelo.id %}" method="POST">
+            {% csrf_token %}
+            <label for="puntuacion" style="display:block; margin-bottom:5px;"><strong>Tu voto:</strong></label>
+            
+            <div class="vote-controls">
+                <select name="puntuacion" id="puntuacion" class="form-control" style="flex-grow: 1;">
+                    <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                    <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+                    <option value="3" selected>⭐⭐⭐ Normal</option>
+                    <option value="2">⭐⭐ Regular</option>
+                    <option value="1">⭐ Malo</option>
+                </select>
+                
+                <button type="submit" class="btn" style="padding: 5px 15px;">Enviar</button>
+            </div>
+        </form>
+    </div>
+
   </div>
 
 </div>
 
-<p style="margin-top: 32px;">
+<div style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 20px;">
+  
   <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
-</p>
+
+  <a href="{% url 'borrar_modelo' modelo.id %}" class="btn" style="background-color: #dc3545; color: white; border:none;">
+    🗑️ Eliminar Modelo
+  </a>
+
+</div>
+
 
 {% endblock %}

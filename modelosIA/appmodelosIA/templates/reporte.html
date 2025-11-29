@@ -1,118 +1,92 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Reporte de Modelos{% endblock %}
+{% block title %}Laboratorio ML{% endblock %}
 
 {% block header %}
-  <h1>Reporte de Machine Learning</h1>
-  <p class="default">Análisis de Modelos: Linear Regression, PCA y K-Means</p>
+  <h1>🧪 Laboratorio de Machine Learning</h1>
+  <p class="default">Selecciona un Dataset y un Algoritmo para entrenarlo en tiempo real.</p>
 {% endblock %}
 
 {% block content %}
 
-<div class="report-content">
-
-    {% comment %} SECCIÓN LINEAR REGRESSION {% endcomment %}
-    <div class="seccion">
-        <h2>📈 1. Linear Regression</h2>
-        <div class="metric-grid">
-            <div class="metric-card">
-                <div class="label">Muestras</div>
-                    <div class="value">{{ resultados_lr.n_muestras }}</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">R² Score</div>
-                    <div class="value">{{ resultados_lr.r2|floatformat:3 }}</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">MSE</div>
-                    <div class="value">{{ resultados_lr.mse|floatformat:2 }}</div>
-            </div>
-        </div>
-        <h3>Importancia de Características</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Característica</th>
-                    <th>Coeficiente</th>
-                </tr>
-            </thead>
-            
-            <tbody>
-                {% for row in resultados_lr.coeficientes_df %}
-                <tr><td><strong>{{ row.Característica }}</strong></td><td>{{ row.Coeficiente|floatformat:2 }}</td></tr>
+<!-- CONTROLES -->
+<div class="control-panel" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+    <form method="GET" action="" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+        
+        <!-- Selector Dataset -->
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">1. Elige los Datos:</label>
+            <select name="dataset_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="">-- Seleccionar --</option>
+                {% for ds in datasets_list %}
+                    <option value="{{ ds.id }}" {% if sel_ds_id == ds.id %}selected{% endif %}>
+                        📊 {{ ds.nombre }} ({{ ds.tipo_tarea }})
+                    </option>
                 {% endfor %}
-            </tbody>
-        </table>
-        <h3>Visualización</h3>
-        <div class="imagen-container">
-            <img src="{{ resultados_lr.imagen }}" alt="Linear Regression Results">
+            </select>
         </div>
-    </div>
 
-    {% comment %} SECCIÓN PCA {% endcomment %}
-    <div class="seccion">
-        <h2>🔍 2. PCA</h2>
-        <div class="metric-grid">
-            <div class="metric-card">
-                <div class="label">Dimensión Original</div>
-                <div class="value">{{ resultados_pca.n_caracteristicas_original }}D</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">Dimensión Reducida</div>
-                <div class="value">{{ resultados_pca.n_componentes }}D</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">Varianza Explicada</div>
-                <div class="value">{{ resultados_pca.varianza_total|floatformat:2 }}%</div>
-            </div>
-        </div>
-        <h3>Cargas de Componentes</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Característica</th>
-                    <th>PC1</th>
-                    <th>PC2</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in resultados_pca.componentes_df %}
-                <tr>
-                    <td><strong>{{ row.Característica }}</strong></td>
-                    <td>{{ row.PC1|floatformat:4 }}</td>
-                    <td>{{ row.PC2|floatformat:4 }}</td>
-                </tr>
+        <!-- Selector Modelo -->
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">2. Elige el Algoritmo:</label>
+            <select name="algo_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="">-- Seleccionar --</option>
+                {% for algo in models_list %}
+                    <option value="{{ algo.id }}" {% if sel_algo_id == algo.id %}selected{% endif %}>
+                        🤖 {{ algo.nombre }} [{{ algo.tipo_tarea }}]
+                    </option>
                 {% endfor %}
-            </tbody>
-        </table>
-        <h3>Visualización</h3>
-        <div class="imagen-container">
-            <img src="{{ resultados_pca.imagen }}" alt="PCA Results">
+            </select>
         </div>
-    </div>
 
-    {% comment %} SECCIÓN K-MEANS {% endcomment %}
-    <div class="seccion">
-        <h2>🎯 3. K-Means Clustering</h2>
-        <div class="metric-grid">
-            <div class="metric-card">
-                <div class="label">Clusters</div>
-                <div class="value">{{ resultados_kmeans.n_clusters }}</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">Silhouette Score</div>
-                <div class="value">{{ resultados_kmeans.silhouette|floatformat:3 }}</div>
-            </div>
-            <div class="metric-card">
-                <div class="label">Inercia</div>
-                <div class="value">{{ resultados_kmeans.inercia|floatformat:2 }}</div>
-            </div>
+        <button type="submit" class="btn" style="background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-size: 1em; cursor: pointer; font-weight: bold;">
+            ⚡ Ejecutar
+        </button>
+    </form>
+</div>
+
+<!-- RESULTADOS -->
+{% if error %}
+    <div style="background: #fee; color: #c00; padding: 15px; border-radius: 5px; border: 1px solid #fcc;">
+        ⚠️ <strong>Error:</strong> {{ error }}
+    </div>
+{% endif %}
+
+{% if resultado %}
+<div class="report-content animate-fade-in">
+    <div class="seccion" style="border-top: 5px solid #3498db; margin-top:20px;">
+        
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            Resultados: {{ resultado.algoritmo }}
+            <span style="font-size: 0.6em; background: #eee; padding: 5px 10px; border-radius: 20px; color: #555;">
+                {{ resultado.tipo|upper }}
+            </span>
+        </h2>
+        
+        <p>Entrenado sobre: <strong>{{ resultado.dataset }}</strong></p>
+
+        <!-- GRID MÉTRICAS -->
+        <div class="metric-grid" style="display: flex; gap: 20px; margin: 20px 0;">
+            {% for nombre, valor in resultado.metricas.items %}
+                <div class="metric-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #e9ecef;">
+                    <div class="label" style="text-transform: uppercase; font-size: 0.8em; color: #777;">{{ nombre }}</div>
+                    <div class="value" style="font-size: 2em; font-weight: bold; color: #2c3e50;">{{ valor }}</div>
+                </div>
+            {% endfor %}
         </div>
-        <h3>Visualización</h3>
-        <div class="imagen-container">
-            <img src="{{ resultados_kmeans.imagen_clusters }}" alt="K-Means Clusters">
+
+        <!-- VISUALIZACIÓN -->
+        <div class="imagen-container" style="text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            {% if resultado.imagen %}
+                <img src="{{ resultado.imagen }}" alt="Gráfico del modelo" style="max-width: 100%; height: auto;">
+            {% else %}
+                <p>No se pudo generar imagen.</p>
+            {% endif %}
         </div>
+
     </div>
 </div>
+{% endif %}
+
 {% endblock %}

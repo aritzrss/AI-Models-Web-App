@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Añadir Nuevo Modelo{% endblock %}
+
+{% block header %}
+    <h1>Añadir Nuevo Modelo</h1>
+    <p class="default">Rellena el formulario para registrar una nueva IA en el sistema.</p>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button type="submit" class="btn" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+                💾 Guardar Modelo
+            </button>
+            <a href="{% url 'modelo' %}" class="btn btn-light" style="text-decoration: none; padding: 10px 20px;">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
