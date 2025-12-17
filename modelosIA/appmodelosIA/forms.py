@@ -22,5 +22,5 @@ class ModeloForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Random Forest V2'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'anio_inventado': forms.NumberInput(attrs={'class': 'form-control'}),
+            'anio_inventado': forms.NumberInput(attrs={'class': 'form-control', 'min': '1901', 'max': '2025', 'step': '1'})
         }

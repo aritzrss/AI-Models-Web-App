@@ -3,3 +3,6 @@
 venv/
 env/
 ENV/
+modelosIA/appmodelosIA/__pycache__/*
+modelosIA/migrations/__pycache__/*
+modelosIA/__pycache__/*

@@ -100,12 +100,12 @@
   
   <div>
     <label>Año desde</label>
-    <input type="number" name="anio_desde" value="{{ f.anio_desde }}">
+    <input type="number" name="anio_desde" min="1901" max="2025" step="1" value="{{ f.anio_desde }}">
   </div>
   
   <div>
     <label>Año hasta</label>
-    <input type="number" name="anio_hasta" value="{{ f.anio_hasta }}">
+    <input type="number" name="anio_hasta" min= 1901 max="2025" step="1" value="{{ f.anio_hasta }}">
   </div>
   
   <div>

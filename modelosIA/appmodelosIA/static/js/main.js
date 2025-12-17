@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const hasta = parseInt(inputHasta.value);
 
                 // Si el año de inicio es mayor que el final, es un error lógico
-                if (desde > hasta) {
+                if (desde > hasta || desde < 1900 || hasta > 2026) {
                     event.preventDefault(); // IMPORTANTE: Detiene el filtrado
                     alert("⚠️ Error en los años: \nEl año 'Desde' no puede ser mayor que el año 'Hasta'.");
                     
