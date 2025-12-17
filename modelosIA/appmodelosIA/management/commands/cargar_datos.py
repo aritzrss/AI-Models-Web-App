@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'Carga datos iniciales para la aplicación (Seed Data)'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write(self.style.WARNING('⚠️  Borrando datos antiguos...'))
+        self.stdout.write(self.style.WARNING('Borrando datos antiguos...'))
         
         # Limpiar base de datos
         MLParametro.objects.all().delete()
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         Modelo.objects.all().delete()
         Dataset.objects.all().delete()
 
-        self.stdout.write(self.style.SUCCESS('✓ Base de datos limpia.'))
+        self.stdout.write(self.style.SUCCESS('Base de datos limpia.'))
 
         self.stdout.write('Creando datos para el Laboratorio ML...')
 
@@ -57,11 +57,10 @@ class Command(BaseCommand):
         pca = MLAlgorithm.objects.create(nombre="PCA", clave="pca", tipo_tarea="reduccion")
         MLParametro.objects.create(algoritmo=pca, nombre="n_components", valor="2", tipo_dato="int")
 
-        self.stdout.write(self.style.SUCCESS(f'✓ {MLAlgorithm.objects.count()} Algoritmos creados.'))
+        self.stdout.write(self.style.SUCCESS(f' {MLAlgorithm.objects.count()} Algoritmos creados.'))
 
-        # ==========================================
+
         # 3. CREAR DATOS PARA EL DASHBOARD (Fichas)
-        # ==========================================
         self.stdout.write('Creando datos para el Dashboard...')
 
         # Datasets informativos (Categorías)
@@ -98,5 +97,5 @@ class Command(BaseCommand):
             imagen_dashboard=dummy_image
         )
 
-        self.stdout.write(self.style.SUCCESS(f'✓ {Modelo.objects.count()} Fichas de modelos creadas.'))
-        self.stdout.write(self.style.SUCCESS('🎉 CARGA DE DATOS COMPLETADA CORRECTAMENTE'))
+        self.stdout.write(self.style.SUCCESS(f' {Modelo.objects.count()} Fichas de modelos creadas.'))
+        self.stdout.write(self.style.SUCCESS('CARGA DE DATOS COMPLETADA CORRECTAMENTE'))

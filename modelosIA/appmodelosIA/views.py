@@ -1,12 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect, JsonResponse # <--- AÑADIDO JsonResponse
-from django.template.loader import render_to_string # <--- AÑADIDO para AJAX
+from django.http import HttpResponseRedirect, JsonResponse # AÑADIDO JsonResponse
+from django.template.loader import render_to_string # AÑADIDO para AJAX
 from datetime import datetime
 import base64
 from io import BytesIO
 from .models import Modelo, Dataset, MLDataset, MLAlgorithm, TIPO_TAREA_CHOICES, FAMILIA_CHOICES, MODALIDAD_CHOICES
 import matplotlib
-matplotlib.use('Agg') #necesario para navegadores web, así no se abre una ventana con el gráfico
+matplotlib.use('Agg') # necesario para navegadores web, así no se abre una ventana con el gráfico
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets
@@ -235,9 +235,8 @@ def ejecutar_analisis_dinamico_db(dataset_obj, algo_obj):
 
     return resultado
 
-# -----------------------------------------------------------------------------
-# VISTA MODIFICADA PARA SOPORTAR AJAX
-# -----------------------------------------------------------------------------
+
+# Vista modificada para soportar ajax
 def reporte_view(request):
     
     print("\n[LOG] Usuario en: Página de Reporte ML (Laboratorio)")
@@ -306,10 +305,10 @@ def votar_modelo(request, modelo_id):
                 {'modelo': modelo}, 
                 request=request
             )
-            return JsonResponse({'html': html}) # <-- RETURN para AJAX POST
+            return JsonResponse({'html': html}) # RETURN para AJAX POST
 
-        return redirect('modelo_detail', modelo_id=modelo_id) # <-- RETURN para NON-AJAX POST
+        return redirect('modelo_detail', modelo_id=modelo_id) # RETURN para NON-AJAX POST
 
     # CASO 2: La petición es un GET (o cualquier otro método)
     # Si alguien intenta acceder a la URL directamente, lo redirigimos.
-    return redirect('modelo_detail', modelo_id=modelo_id) # <-- RETURN para GET
+    return redirect('modelo_detail', modelo_id=modelo_id) # RETURN para GET

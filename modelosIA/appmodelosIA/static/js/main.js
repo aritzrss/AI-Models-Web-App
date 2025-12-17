@@ -2,9 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log("JS Cargado correctamente");
 
-    // ==========================================================================
-    // 1. EFECTO FADE-IN GLOBAL AL CARGAR PÁGINA
-    // ==========================================================================
+    // Efecto FADE-IN GLOBAL al cargar pagina
+
     document.body.style.opacity = 0;
     document.body.style.transition = 'opacity 0.5s ease-in';
     
@@ -12,9 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.opacity = 1;
     }, 50);
 
-    // ==========================================================================
-    // 2. VALIDACIÓN DEL FORMULARIO DE CREAR MODELO (crear_modelo.html)
-    // ==========================================================================
+
+    // Validacion del formulario de crear modelo (crear_modelo.html)
     const formularioCrear = document.getElementById('form-crear');
 
     if (formularioCrear) {
@@ -48,9 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==========================================================================
-    // 3. VALIDACIÓN DE FILTROS DE AÑO (formulario.html)
-    // ==========================================================================
+    // Validación de filtrado de año (formulario.html)
+    
     const formFiltros = document.querySelector('.form-filters');
 
     if (formFiltros) {
@@ -67,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (desde > hasta) {
                     event.preventDefault();
-                    alert("⚠️ Error en los años: \nEl año 'Desde' no puede ser mayor que el año 'Hasta'.");
+                    alert("Error en los años: \nEl año 'Desde' no puede ser mayor que el año 'Hasta'.");
                     inputDesde.style.border = "2px solid red";
                     inputHasta.style.border = "2px solid red";
                 }
@@ -75,10 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==========================================================================
-    // 4. LÓGICA DE CONFIRMACIÓN DE BORRADO (Dos Pasos)
-    // ==========================================================================
-    
+    // Lógica confirmación de borrado (Dos Pasos)
     // Paso 1: Aviso al hacer clic en el enlace "Eliminar" en la página de detalle.
     const linkBorrar = document.getElementById('link-borrar');
     if (linkBorrar) {
@@ -95,16 +89,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const botonConfirmarBorrado = document.querySelector('.btn-borrar-js');
     if (botonConfirmarBorrado) {
         botonConfirmarBorrado.addEventListener('click', function(event) {
-            const confirmacionFinal = confirm("¡ACCIÓN IRREVERSIBLE! ⚠️\n\n¿Estás completamente seguro de que quieres eliminar este modelo para siempre?");
+            const confirmacionFinal = confirm("¡ACCIÓN IRREVERSIBLE! \n\n¿Estás completamente seguro de que quieres eliminar este modelo para siempre?");
             if (!confirmacionFinal) {
                 event.preventDefault(); 
             }
         });
     }
 
-    // ==========================================================================
-    // 5. AJAX PARA EL LABORATORIO DE ML (reporte.html)
-    // ==========================================================================
+    // Ajax para el laboratorio de ML (reporte.html)
     const formLaboratorio = document.getElementById('form-laboratorio');
     
     if (formLaboratorio) {
@@ -115,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
             
             const botonTextoOriginal = botonEjecutar.innerHTML;
-            botonEjecutar.innerHTML = '⏳ Procesando...';
+            botonEjecutar.innerHTML = 'Procesando...';
             botonEjecutar.disabled = true;
             resultadoContainer.style.opacity = '0.5';
 
@@ -143,9 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==========================================================================
-    // 6. AJAX PARA LA VALORACIÓN DE MODELOS (modelo_detail.html)
-    // ==========================================================================
+    // Ajax para la valoración de modelos (modelo_detail.html)
     const valoracionContainer = document.getElementById('valoracion-container');
 
     if (valoracionContainer) {
