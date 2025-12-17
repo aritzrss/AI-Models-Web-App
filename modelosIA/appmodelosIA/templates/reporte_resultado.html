@@ -1,0 +1,45 @@
+{% comment %}
+Este fichero contiene ÚNICAMENTE el bloque de resultados o de error.
+Será incluido en la página principal y devuelto por las peticiones AJAX.
+{% endcomment %}
+
+{% if error %}
+    <div style="background: #fee; color: #c00; padding: 15px; border-radius: 5px; border: 1px solid #fcc;">
+        ⚠️ <strong>Error:</strong> {{ error }}
+    </div>
+{% endif %}
+
+{% if resultado %}
+<div class="report-content animate-fade-in">
+    <div class="seccion" style="border-top: 5px solid #3498db; margin-top:20px;">
+        
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            Resultados: {{ resultado.algoritmo }}
+            <span style="font-size: 0.6em; background: #eee; padding: 5px 10px; border-radius: 20px; color: #555;">
+                {{ resultado.tipo|upper }}
+            </span>
+        </h2>
+        
+        <p>Entrenado sobre: <strong>{{ resultado.dataset }}</strong></p>
+
+        <!-- GRID MÉTRICAS -->
+        <div class="metric-grid" style="display: flex; gap: 20px; margin: 20px 0;">
+            {% for nombre, valor in resultado.metricas.items %}
+                <div class="metric-card" style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center; border: 1px solid #e9ecef;">
+                    <div class="label" style="text-transform: uppercase; font-size: 0.8em; color: #777;">{{ nombre }}</div>
+                    <div class="value" style="font-size: 2em; font-weight: bold; color: #2c3e50;">{{ valor }}</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- VISUALIZACIÓN -->
+        <div class="imagen-container" style="text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+            {% if resultado.imagen %}
+                <img src="{{ resultado.imagen }}" alt="Gráfico del modelo" style="max-width: 100%; height: auto;">
+            {% else %}
+                <p>No se pudo generar imagen.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}

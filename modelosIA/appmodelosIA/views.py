@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse # <--- AÑADIDO JsonResponse
+from django.template.loader import render_to_string # <--- AÑADIDO para AJAX
 from datetime import datetime
 import base64
 from io import BytesIO
@@ -19,7 +20,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.svm import SVC, SVR
 from sklearn.neighbors import KNeighborsClassifier
 from .forms import ModeloForm 
-
+from .models import Modelo
 def crear_modelo_view(request):
     if request.method == 'POST':
         # Cargamos los datos (request.POST) y la imagen (request.FILES)
@@ -234,6 +235,9 @@ def ejecutar_analisis_dinamico_db(dataset_obj, algo_obj):
 
     return resultado
 
+# -----------------------------------------------------------------------------
+# VISTA MODIFICADA PARA SOPORTAR AJAX
+# -----------------------------------------------------------------------------
 def reporte_view(request):
     
     print("\n[LOG] Usuario en: Página de Reporte ML (Laboratorio)")
@@ -247,6 +251,7 @@ def reporte_view(request):
     resultado = None
     error_msg = None
     
+    # Esta lógica de ejecución es la misma
     if sel_ds_id and sel_algo_id:
         try:
             ds_obj = MLDataset.objects.get(pk=sel_ds_id)
@@ -265,4 +270,46 @@ def reporte_view(request):
         'error': error_msg,
         'fecha_actual': datetime.now()
     }
+    
+    # Comprobamos si la petición es AJAX por la cabecera que añade 'fetch'
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    if is_ajax:
+        # Si es AJAX, renderizamos solo el fragmento de HTML y lo devolvemos en un JSON
+        html = render_to_string('reporte_resultado.html', context, request=request)
+        return JsonResponse({'html': html})
+    
+    # Si no es AJAX, renderizamos la página completa como se hacía originalmente
     return render(request, 'reporte.html', context)
+
+def votar_modelo(request, modelo_id):
+    # CASO 1: La petición es un POST (el usuario ha enviado el formulario)
+    if request.method == 'POST':
+        modelo = get_object_or_404(Modelo, pk=modelo_id)
+        puntuacion_str = request.POST.get('puntuacion')
+
+        try:
+            puntuacion = int(puntuacion_str)
+            if 1 <= puntuacion <= 5:
+                modelo.agregar_voto(puntuacion)
+        except (ValueError, TypeError):
+            # Si el valor no es válido, simplemente no hacemos nada.
+            pass
+
+
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+        # CASO 1A: Es un POST enviado vía AJAX
+        if is_ajax:
+            html = render_to_string(
+                'valoracion.html', 
+                {'modelo': modelo}, 
+                request=request
+            )
+            return JsonResponse({'html': html}) # <-- RETURN para AJAX POST
+
+        return redirect('modelo_detail', modelo_id=modelo_id) # <-- RETURN para NON-AJAX POST
+
+    # CASO 2: La petición es un GET (o cualquier otro método)
+    # Si alguien intenta acceder a la URL directamente, lo redirigimos.
+    return redirect('modelo_detail', modelo_id=modelo_id) # <-- RETURN para GET

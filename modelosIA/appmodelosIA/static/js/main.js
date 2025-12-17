@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
     botonesBorrar.forEach(boton => {
         boton.addEventListener('click', function(event) {
             // Función nativa de JS para confirmar
-            const confirmacion = confirm("¿Seguro que quieres ir a la página de borrado?");
+            const confirmacion = confirm("¿Seguro que quieres borrar el modelo? ⚠️");
             
             if (!confirmacion) {
                 event.preventDefault(); // Si dice "Cancelar", no sigue el enlace

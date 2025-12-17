@@ -3,6 +3,8 @@
 {% block title %}Borrar Modelo{% endblock %}
 
 {% block content %}
+
+<!-- ========== CAJA DE CONFIRMACIÓN CENTRAL ========== -->
 <div style="max-width: 500px; margin: 50px auto; text-align: center; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
     
     <h2 style="color: #dc3545;">⚠️ ¿Estás seguro?</h2>
@@ -12,12 +14,12 @@
     
     <p style="color: #666;">Esta acción no se puede deshacer. Se perderán todos los datos y valoraciones asociadas.</p>
 
-    <form method="POST">
+    <form method="POST" id="form-borrar">
         {% csrf_token %}
         
         <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
             <!-- Botón que confirma el borrado -->
-            <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+            <button type="submit" class="btn btn-borrar-js" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer;">
                 Sí, eliminar definitivamente
             </button>
             
@@ -28,4 +30,6 @@
         </div>
     </form>
 </div>
+
+
 {% endblock %}

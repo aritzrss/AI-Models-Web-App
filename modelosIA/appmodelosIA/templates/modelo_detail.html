@@ -111,35 +111,10 @@
         {% endif %}
     </div>
 
-    <!-- 3. Caja de Valoración -->
-    <div class="sidebar-section">
-        <h3 style="margin-top:0;">Valoración</h3>
-        
-        <!-- Info actual -->
-        <div class="rating-header">
-            <span class="rating-score">★</span>
-            <span class="rating-value">{{ modelo.rating_promedio|floatformat:1 }}</span>
-            <span style="color: #666;">/ 5</span>
-            <p class="rating-subtext">Basado en {{ modelo.cantidad_votos }} votos</p>
-        </div>
-
-        <!-- Formulario Votar -->
-        <form action="{% url 'votar_modelo' modelo.id %}" method="POST">
-            {% csrf_token %}
-            <label for="puntuacion" style="display:block; margin-bottom:5px;"><strong>Tu voto:</strong></label>
-            
-            <div class="vote-controls">
-                <select name="puntuacion" id="puntuacion" class="form-control" style="flex-grow: 1;">
-                    <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
-                    <option value="4">⭐⭐⭐⭐ Muy bueno</option>
-                    <option value="3" selected>⭐⭐⭐ Normal</option>
-                    <option value="2">⭐⭐ Regular</option>
-                    <option value="1">⭐ Malo</option>
-                </select>
-                
-                <button type="submit" class="btn" style="padding: 5px 15px;">Enviar</button>
-            </div>
-        </form>
+    <!-- 3. Caja de Valoración (con AJAX) -->
+    <!-- Este div actúa como contenedor para ser actualizado por AJAX -->
+    <div id="valoracion-container" class="sidebar-section">
+        {% include 'valoracion.html' %}
     </div>
 
   </div>
@@ -150,11 +125,61 @@
   
   <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
 
-  <a href="{% url 'borrar_modelo' modelo.id %}" class="btn btn-borrar-js" style="background-color: #dc3545; color: white; border:none;">
+  <a href="{% url 'borrar_modelo' modelo.id %}" class="btn" style="background-color: #dc3545; color: white; border:none;">
     🗑️ Eliminar Modelo
   </a>
 
 </div>
 
+{% endblock %}
 
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Seleccionamos el contenedor. Escucharemos los eventos en él
+    // porque el formulario de dentro será reemplazado después de cada voto.
+    const valoracionContainer = document.getElementById('valoracion-container');
+
+    if (valoracionContainer) {
+        valoracionContainer.addEventListener('submit', function(event) {
+            
+            // Nos aseguramos de que el evento viene del formulario de votación
+            if (event.target && event.target.id === 'form-votar') {
+                
+                // 1. Prevenimos el envío normal que recarga toda la página
+                event.preventDefault();
+                
+                const form = event.target;
+                const button = form.querySelector('button[type="submit"]');
+
+                // 2. Damos feedback visual al usuario mientras se procesa el voto
+                button.disabled = true;
+                button.innerHTML = '⏳';
+
+                // 3. Hacemos la petición AJAX con Fetch API
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new FormData(form) // FormData envía los datos del form, incluido el CSRF token
+                })
+                .then(response => response.json()) // Esperamos una respuesta en formato JSON
+                .then(data => {
+                    // 4. Reemplazamos el contenido del contenedor con el nuevo HTML recibido
+                    valoracionContainer.innerHTML = data.html;
+                })
+                .catch(error => {
+                    console.error('Error al procesar el voto:', error);
+                    // Si algo falla, restauramos el botón para que el usuario pueda reintentar
+                    button.disabled = false;
+                    button.innerHTML = 'Enviar';
+                });
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
