@@ -1,0 +1,9 @@
+E4a
+
+Metodos CRUD: Create y Delete
+Opcion 2: Carga de datos iniciales para la aplicación
+
+E4b
+
+Opcion 1: Alertas JS
+opcion 2: Uso de AJAX para el reporte y valoración de modelos
