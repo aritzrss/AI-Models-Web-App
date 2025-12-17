@@ -5,82 +5,24 @@
 
 {% block header %}
   <h1>{{ modelo.nombre }}</h1>
-  <p class="default">Información detallada y parámetros del modelo.</p>
+  <p class="muted">Información detallada y parámetros del modelo.</p>
 {% endblock %}
 
 {% block content %}
 
-{# Estilos específicos para esta página #}
-<style>
-    /* Clases auxiliares para no ensuciar el HTML con style="" */
-    .sidebar-section {
-        background: #f8f9fa; 
-        padding: 20px; 
-        border-radius: 8px; 
-        border: 1px solid #ddd;
-        margin-top: 20px;
-    }
-    
-    .rating-header {
-        margin-bottom: 15px;
-    }
-    
-    .rating-score {
-        font-size: 2em; 
-        color: #ffc107;
-        margin-right: 5px;
-    }
-    
-    .rating-value {
-        font-size: 1.5em; 
-        font-weight: bold;
-    }
-    
-    .rating-subtext {
-        margin: 0; 
-        color: #888; 
-        font-size: 0.9em;
-    }
-
-    .param-list {
-        list-style-type: none; 
-        padding: 0;
-    }
-
-    .param-item {
-        background: #fff; /* Blanco para contrastar con el fondo gris de la sidebar */
-        border: 1px solid #eee;
-        margin-bottom: 5px; 
-        padding: 10px; 
-        border-radius: 4px; 
-        display: flex; 
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .vote-controls {
-        display: flex; 
-        gap: 10px; 
-        width: 100%;
-    }
-</style>
-
 <div class="detail-layout">
 
-  {% comment %} --- COLUMNA IZQUIERDA: VISUAL Y DESCRIPTIVA --- {% endcomment %}
   <div class="detail-main">
     {% if modelo.imagen_dashboard %}
       <img class="detail-image" src="{{ modelo.imagen_dashboard.url }}" alt="Ilustración de {{ modelo.nombre }}">
     {% endif %}
     
-    <h2 style="margin-top: 24px;">Descripción</h2>
+    <h2>Descripción</h2>
     <p>{{ modelo.descripcion|linebreaks }}</p>
   </div>
 
-  {% comment %} --- COLUMNA DERECHA: DATOS TÉCNICOS E INTERACCIÓN --- {% endcomment %}
   <div class="detail-sidebar">
     
-    <!-- 1. Ficha Técnica Básica -->
     <ul class="info-list">
       <li><strong>Tipo de tarea:</strong> {{ modelo.get_tipo_tarea_display }}</li>
       <li><strong>Familia:</strong> {{ modelo.get_familia_display }}</li>
@@ -93,26 +35,23 @@
       {% endif %}
     </ul>
 
-    <!-- 2. Parámetros Técnicos -->
     <div class="sidebar-section">
-        <h3 style="margin-top:0;">Parámetros Técnicos</h3>
+        <h3>Parámetros Técnicos</h3>
         
         {% if modelo.parametros.all %}
             <ul class="param-list">
                 {% for param in modelo.parametros.all %}
                     <li class="param-item">
                         <strong>{{ param.nombre }}</strong> 
-                        <span style="font-family: monospace; color: #d63384;">{{ param.valor }}</span>
+                        <span class="param-value">{{ param.valor }}</span>
                     </li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p style="color: #666; font-style: italic;">No hay parámetros definidos.</p>
+            <p class="no-params-message">No hay parámetros definidos.</p>
         {% endif %}
     </div>
 
-    <!-- 3. Caja de Valoración (con AJAX) -->
-    <!-- Este div actúa como contenedor para ser actualizado por AJAX -->
     <div id="valoracion-container" class="sidebar-section">
         {% include 'valoracion.html' %}
     </div>
@@ -121,11 +60,11 @@
 
 </div>
 
-<div style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 20px;">
+<div class="detail-footer-actions">
   
   <a class="btn btn-light" href="{% url 'modelo' %}">← Volver al dashboard</a>
 
-  <a href="{% url 'borrar_modelo' modelo.id %}" class="btn" style="background-color: #dc3545; color: white; border:none;">
+  <a href="{% url 'borrar_modelo' modelo.id %}" class="btn btn-danger">
     🗑️ Eliminar Modelo
   </a>
 
@@ -133,47 +72,38 @@
 
 {% endblock %}
 
-
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Seleccionamos el contenedor. Escucharemos los eventos en él
-    // porque el formulario de dentro será reemplazado después de cada voto.
     const valoracionContainer = document.getElementById('valoracion-container');
 
     if (valoracionContainer) {
         valoracionContainer.addEventListener('submit', function(event) {
             
-            // Nos aseguramos de que el evento viene del formulario de votación
             if (event.target && event.target.id === 'form-votar') {
                 
-                // 1. Prevenimos el envío normal que recarga toda la página
                 event.preventDefault();
                 
                 const form = event.target;
                 const button = form.querySelector('button[type="submit"]');
 
-                // 2. Damos feedback visual al usuario mientras se procesa el voto
                 button.disabled = true;
                 button.innerHTML = '⏳';
 
-                // 3. Hacemos la petición AJAX con Fetch API
                 fetch(form.action, {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                     },
-                    body: new FormData(form) // FormData envía los datos del form, incluido el CSRF token
+                    body: new FormData(form)
                 })
-                .then(response => response.json()) // Esperamos una respuesta en formato JSON
+                .then(response => response.json())
                 .then(data => {
-                    // 4. Reemplazamos el contenido del contenedor con el nuevo HTML recibido
                     valoracionContainer.innerHTML = data.html;
                 })
                 .catch(error => {
                     console.error('Error al procesar el voto:', error);
-                    // Si algo falla, restauramos el botón para que el usuario pueda reintentar
                     button.disabled = false;
                     button.innerHTML = 'Enviar';
                 });

@@ -5,21 +5,15 @@
 
 {% block header %}
   <h1>🧪 Laboratorio de Machine Learning</h1>
-  <p class="default">Selecciona un Dataset y un Algoritmo para entrenarlo en tiempo real.</p>
+  <p class="muted">Selecciona un Dataset y un Algoritmo para entrenarlo en tiempo real.</p>
 {% endblock %}
 
 {% block content %}
-
-<!-- CONTROLES -->
-<div class="control-panel" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
-    
-    <!-- CAMBIO: Añadido id="form-laboratorio" -->
-    <form id="form-laboratorio" method="GET" action="{% url 'reporte' %}" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
-        
-        <!-- Selector Dataset -->
-        <div style="flex: 1; min-width: 200px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">1. Elige los Datos:</label>
-            <select name="dataset_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+<div class="control-panel">
+    <form id="form-laboratorio" method="GET" action="{% url 'reporte' %}">
+        <div class="form-group-flex">
+            <label>1. Elige los Datos:</label>
+            <select name="dataset_id" class="form-control">
                 <option value="">-- Seleccionar --</option>
                 {% for ds in datasets_list %}
                     <option value="{{ ds.id }}" {% if sel_ds_id == ds.id %}selected{% endif %}>
@@ -28,11 +22,9 @@
                 {% endfor %}
             </select>
         </div>
-
-        <!-- Selector Modelo -->
-        <div style="flex: 1; min-width: 200px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">2. Elige el Algoritmo:</label>
-            <select name="algo_id" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+        <div class="form-group-flex">
+            <label>2. Elige el Algoritmo:</label>
+            <select name="algo_id" class="form-control">
                 <option value="">-- Seleccionar --</option>
                 {% for algo in models_list %}
                     <option value="{{ algo.id }}" {% if sel_algo_id == algo.id %}selected{% endif %}>
@@ -41,78 +33,13 @@
                 {% endfor %}
             </select>
         </div>
-
-        <!-- CAMBIO: Añadido id="btn-ejecutar" -->
-        <button id="btn-ejecutar" type="submit" class="btn" style="background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-size: 1em; cursor: pointer; font-weight: bold;">
+        <button id="btn-ejecutar" type="submit" class="btn btn-execute">
             ⚡ Ejecutar
         </button>
     </form>
 </div>
 
-<!-- 
-  CAMBIO: Contenedor para los resultados de AJAX
-  - En la carga inicial, Django renderizará aquí los resultados si los hay.
-  - El JavaScript reemplazará el contenido de este div con las respuestas AJAX.
--->
 <div id="resultado-container">
     {% include 'reporte_resultado.html' %}
 </div>
-
-<!-- 
-  AÑADIDO: Script de AJAX al final del bloque de contenido
-  Asegúrate de que tu base.html carga un main.js o incluye un block para scripts
--->
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    const form = document.getElementById('form-laboratorio');
-    const resultadoContainer = document.getElementById('resultado-container');
-    const boton = document.getElementById('btn-ejecutar');
-
-    form.addEventListener('submit', function(event) {
-        // 1. Evitamos que el formulario se envíe de la forma tradicional
-        event.preventDefault();
-        
-        // Feedback para el usuario: mostramos que algo está pasando
-        const botonTextoOriginal = boton.innerHTML;
-        boton.innerHTML = '⏳ Procesando...';
-        boton.disabled = true;
-        resultadoContainer.style.opacity = '0.5';
-
-        // 2. Creamos la URL con los parámetros del formulario
-        const formData = new FormData(form);
-        const params = new URLSearchParams(formData).toString();
-        const url = form.action + '?' + params;
-
-        // 3. Hacemos la petición AJAX con Fetch API
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                // Cabecera clave para que Django sepa que es una petición AJAX
-                'X-Requested-With': 'XMLHttpRequest',
-            }
-        })
-        .then(response => response.json()) // Esperamos una respuesta JSON
-        .then(data => {
-            // 4. Actualizamos el contenedor con el HTML que nos devuelve la vista
-            resultadoContainer.innerHTML = data.html;
-        })
-        .catch(error => {
-            // Manejo de errores de red
-            console.error('Error en la petición AJAX:', error);
-            resultadoContainer.innerHTML = '<div style="color: red;">Ocurrió un error de conexión. Inténtalo de nuevo.</div>';
-        })
-        .finally(() => {
-            // 5. Restauramos el botón y la opacidad, haya ido bien o mal
-            boton.innerHTML = botonTextoOriginal;
-            boton.disabled = false;
-            resultadoContainer.style.opacity = '1';
-        });
-    });
-});
-</script>
-{% endblock %}
-
-
 {% endblock %}

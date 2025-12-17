@@ -3,33 +3,23 @@
 {% block title %}Borrar Modelo{% endblock %}
 
 {% block content %}
-
-<!-- ========== CAJA DE CONFIRMACIÓN CENTRAL ========== -->
-<div style="max-width: 500px; margin: 50px auto; text-align: center; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
-    
-    <h2 style="color: #dc3545;">⚠️ ¿Estás seguro?</h2>
-    
+<div class="confirm-box">
+    <h2 class="confirm-title">⚠️ ¿Estás seguro?</h2>
     <p>Estás a punto de eliminar el modelo:</p>
     <h3>{{ modelo.nombre }}</h3>
-    
-    <p style="color: #666;">Esta acción no se puede deshacer. Se perderán todos los datos y valoraciones asociadas.</p>
+    <p class="confirm-subtext">Esta acción no se puede deshacer. Se perderán todos los datos y valoraciones asociadas.</p>
 
     <form method="POST" id="form-borrar">
         {% csrf_token %}
-        
-        <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px;">
-            <!-- Botón que confirma el borrado -->
-            <button type="submit" class="btn btn-borrar-js" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+        <div class="confirm-actions">
+            <!-- Clase añadida para el script de confirmación en main.js -->
+            <button type="submit" class="btn btn-danger btn-borrar-js">
                 Sí, eliminar definitivamente
             </button>
-            
-            <!-- Botón para cancelar y volver atrás -->
-            <a href="{% url 'modelo_detail' modelo.id %}" class="btn btn-light" style="padding: 10px 20px; text-decoration: none;">
+            <a href="{% url 'modelo_detail' modelo.id %}" class="btn btn-light">
                 Cancelar
             </a>
         </div>
     </form>
 </div>
-
-
 {% endblock %}

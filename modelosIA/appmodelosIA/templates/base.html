@@ -13,16 +13,8 @@
       <div class="navbar-container">
         <a href="{% url 'index' %}" class="navbar-brand">🤖 Dashboard IA</a>
         <ul class="navbar-links">
-          <li>
-            <a href="{% url 'modelo' %}" class="{% if request.resolver_match.url_name == 'modelo' %}active{% endif %}">
-              Modelos
-            </a>
-          </li>
-          <li>
-            <a href="{% url 'reporte' %}" class="{% if request.resolver_match.url_name == 'reporte' %}active{% endif %}">
-              Reporte ML
-            </a>
-          </li>
+          <li><a href="{% url 'modelo' %}" class="{% if request.resolver_match.url_name == 'modelo' %}active{% endif %}">Modelos</a></li>
+          <li><a href="{% url 'reporte' %}" class="{% if request.resolver_match.url_name == 'reporte' %}active{% endif %}">Reporte ML</a></li>
         </ul>
       </div>
     </nav>
@@ -31,20 +23,18 @@
       <header>
         {% block header %}
           <h1>Dashboard de Modelos de IA</h1>
-          <p class="default">Explora, filtra y descubre diferentes modelos de Machine Learning.</p>
+          <p class="muted">Explora, filtra y descubre diferentes modelos de Machine Learning.</p>
         {% endblock %}
       </header>
-
       <main>
         {% block content %}{% endblock %}
       </main>
-
       <footer>
         <p>© 2025 Dashboard IA. Todos los derechos reservados.</p>
       </footer>
     </div>
-
-    {% comment %} Añadimos todo lo de JavaScript aqui y automáticamente se aplicará en todas las ventanas {% endcomment %}
+    
+    <!-- ÚNICO SCRIPT: Carga el JS centralizado al final del body -->
     <script src="{% static 'js/main.js' %}"></script>
 
   </body>

@@ -1,25 +1,18 @@
-{% comment %}
-Fichero Parcial: Contiene únicamente la caja de valoración.
-Es usado en la carga inicial y recargado dinámicamente con AJAX tras un voto.
-{% endcomment %}
+<h3>Valoración</h3>
 
-<h3 style="margin-top:0;">Valoración</h3>
-
-<!-- Info de la valoración actual -->
 <div class="rating-header">
     <span class="rating-score">★</span>
     <span class="rating-value">{{ modelo.rating_promedio|floatformat:1 }}</span>
-    <span style="color: #666;">/ 5</span>
+    <span>/ 5</span>
     <p class="rating-subtext">Basado en {{ modelo.cantidad_votos }} votos</p>
 </div>
 
-<!-- Formulario para Votar -->
-<form id="form-votar" action="{% url 'votar_modelo' modelo.id %}" method="POST">
+<form id="form-votar" class="vote-form" action="{% url 'votar_modelo' modelo.id %}" method="POST">
     {% csrf_token %}
-    <label for="puntuacion" style="display:block; margin-bottom:5px;"><strong>Tu voto:</strong></label>
+    <label for="puntuacion"><strong>Tu voto:</strong></label>
 
     <div class="vote-controls">
-        <select name="puntuacion" id="puntuacion" class="form-control" style="flex-grow: 1;">
+        <select name="puntuacion" id="puntuacion">
             <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
             <option value="4">⭐⭐⭐⭐ Muy bueno</option>
             <option value="3" selected>⭐⭐⭐ Normal</option>
@@ -27,6 +20,6 @@ Es usado en la carga inicial y recargado dinámicamente con AJAX tras un voto.
             <option value="1">⭐ Malo</option>
         </select>
 
-        <button type="submit" class="btn" style="padding: 5px 15px;">Enviar</button>
+        <button type="submit" class="btn btn-vote">Enviar</button>
     </div>
 </form>

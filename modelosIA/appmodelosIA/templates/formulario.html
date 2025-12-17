@@ -5,17 +5,14 @@
 
 {% block content %}
 
-<div style="margin-bottom: 20px; text-align: right;">
-    <a href="{% url 'crear_modelo' %}" class="btn" style="background-color: #28a745; color: white;">
+<div class="action-header">
+    <a href="{% url 'crear_modelo' %}" class="btn btn-success">
         + Añadir Nuevo Modelo
     </a>
 </div>
 
-{% comment %} Formulario de Filtros {% endcomment %}
 <form method="get" class="form-filters">
   
-  <!-- 1. NUEVO: Filtro por Dataset -->
-  <!-- Esto carga la lista de datasets desde la base de datos -->
   <div>
     <label>Dataset</label>
     <select name="dataset">
@@ -28,8 +25,6 @@
     </select>
   </div>
 
-  <!-- 2. NUEVO: Ordenar por (Ranking) -->
-  <!-- Esto permite al usuario elegir el orden de visualización -->
   <div>
     <label>Ordenar por</label>
     <select name="orden">
@@ -40,7 +35,6 @@
     </select>
   </div>
 
-  <!-- Filtros Originales -->
   <div>
     <label>Tipo de tarea</label>
     <select name="tipo_tarea">
@@ -114,27 +108,23 @@
   </div>
 </form>
 
-<p class="default">{{ lista_modelos|length }} resultados encontrados</p>
+<p class="muted">{{ lista_modelos|length }} resultados encontrados</p>
 
-{% comment %} Grid de tarjetas {% endcomment %}
 {% if lista_modelos %}
   <div class="grid">
     {% for modelo in lista_modelos %}
       <div class="card">
-        {% comment %} Contenido principal de cada modelo {% endcomment %}
         <div class="card-content">
           <a href="{% url 'modelo_detail' modelo_id=modelo.id %}">
             <img class="img-thumb" src="{{ modelo.imagen_dashboard.url }}" alt="{{ modelo.nombre }}">
-            
             <h2>{{ modelo.nombre }}</h2>
             
-            <!-- 3. NUEVO: Visualización de Estrellas en la tarjeta -->
-            <div class="rating-preview" style="color: #f39c12; font-weight: bold; margin-bottom: 5px;">
+            <div class="rating-preview">
                 {% if modelo.rating_promedio > 0 %}
                     ★ {{ modelo.rating_promedio|floatformat:1 }} 
-                    <span style="color: #888; font-weight: normal; font-size: 0.9em;">({{ modelo.cantidad_votos }})</span>
+                    <span class="rating-count">({{ modelo.cantidad_votos }})</span>
                 {% else %}
-                    <span style="color: #ccc; font-weight: normal; font-size: 0.9em;">Sin valoración</span>
+                    <span class="no-rating">Sin valoración</span>
                 {% endif %}
             </div>
           </a>
@@ -142,9 +132,8 @@
           <p>{{ modelo.descripcion|truncatechars:120 }}</p>
           
           <p class="tags">
-            <!-- Mostramos también el Dataset si lo tiene -->
             {% if modelo.dataset %}
-                <span style="background-color: #eef; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">
+                <span class="tag-dataset">
                     📂 {{ modelo.dataset.nombre }}
                 </span><br>
             {% endif %}
@@ -153,7 +142,6 @@
           </p>
         </div>
         
-        {% comment %} Botón para abrir cada modelo {% endcomment %}
         <a class="btn" href="{% url 'modelo_detail' modelo_id=modelo.id %}">Ver detalles</a>
       </div>
     {% endfor %}
